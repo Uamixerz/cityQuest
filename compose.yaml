@@ -1,0 +1,47 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cityquest-api:latest
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: 8080
+      SeedAdmin__Enabled: "${SEED_ADMIN_ENABLED:-true}"
+      SeedAdmin__Email: "${SEED_ADMIN_EMAIL:-admin@admin.com}"
+      SeedAdmin__Password: "${SEED_ADMIN_PASSWORD:-123123}"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=cityquest;Username=cityquest;Password=${POSTGRES_PASSWORD:-CityQuestDb2026_7mK9pQ4x}"
+      DataProtection__KeysPath: /app/keys
+      HttpsRedirection__Enabled: "false"
+      Swagger__Enabled: "${SWAGGER_ENABLED:-true}"
+      Cors__AllowedOrigins__0: "${WEB_ORIGIN:-http://localhost:5173}"
+      Routing__Provider: Auto
+      Routing__ApiKey: "${ORS_API_KEY:-eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjUxYjYwYjhkYmNlZjRhOTBhMGYxNjBjOGQzMTM4NmY1IiwiaCI6Im11cm11cjY0In0=}"
+      Routing__TimeoutSeconds: 30
+    ports:
+      - "${API_PORT:-5264}:8080"
+    volumes:
+      - cityquest-keys:/app/keys
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cityquest
+      POSTGRES_USER: cityquest
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-CityQuestDb2026_7mK9pQ4x}"
+    volumes:
+      - cityquest-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cityquest -d cityquest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  cityquest-postgres:
+  cityquest-keys:

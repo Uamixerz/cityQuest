@@ -1,0 +1,17 @@
+**
+!Directory.Build.props
+!CityQuest.Domain/
+!CityQuest.Domain/**
+!CityQuest.Application/
+!CityQuest.Application/**
+!CityQuest.DataAccess/
+!CityQuest.DataAccess/**
+!CityQuest.WebApi/
+!CityQuest.WebApi/**
+!docker/
+!docker/entrypoint.sh
+**/bin/
+**/obj/
+**/*.user
+**/appsettings.Development.json
+**/Properties/launchSettings.json
